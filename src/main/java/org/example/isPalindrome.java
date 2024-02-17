@@ -8,26 +8,20 @@ public class isPalindrome {
     }
 
     public static boolean isPalindrome(String s) {
-        s = s.replaceAll("[^a-zA-Z0-9]", "")
-                .toLowerCase();
-        System.out.println(s);
-        //ArrayList<Character> statck = new ArrayList<>();
-        //ArrayList<Character> queue = new ArrayList<>();
-        String s1 = null;
-        String s2 = null;
-        if( s.length() % 2 == 1 ){
-            s1 = s.substring(0 , s.length()/2  );
-            s2 = s.substring( s.length()/2 + 1  , s.length()  );
-        }else{
-            s1 = s.substring(0 , s.length()/2  );
-            s2 = s.substring( s.length()/2  , s.length()  );
+        int start = 0;
+        int end = s.length()-1;
+        while( start < end ){
+            if( !Character.isLetterOrDigit( s.charAt(start) ) ) start++;
+            else if( !Character.isLetterOrDigit( s.charAt(end) ) ) end--;
+            else{
+                if( Character.toLowerCase( s.charAt(start) ) !=  Character.toLowerCase( s.charAt(end) ) ) return false;
+                else{
+                    start++;
+                    end--;
+                }
+            }
         }
-        StringBuilder builder = new StringBuilder();
-        builder.append(s2);
-        s2 = builder.reverse().toString();
-        if(s1.equals(s2)){
-            return  true;
-        }
-        return false;
+        if( end < 0 ) return false;
+        return true;
     }
 }
