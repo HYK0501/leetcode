@@ -2,48 +2,36 @@ package org.example;
 
 public class SearchInRotatedList {
 
-    public int searchFromRange(int[] nums , int target , int start , int end , boolean pivot){
-        if( start > end){
-            return -1;
+    public int search(int[] nums, int target) {
+        int lo = 0;
+        int hi = nums.length - 1;
+        //last always 2 or 1
+        //when 2 -> mid may is low so hi = mid - 1 will < low
+        while( lo < hi ){
+            int mid = ( lo + hi )/2;
+            if( nums[mid] < nums[hi] ) hi = mid;
+            else lo = mid + 1;
         }
-
-        if( pivot ){
-            if( nums[start] < nums[end] ){
-                pivot = false;
-            }
-        }
-
-        int middle = ( start + end )/2;
-        if( nums[middle] == target){
-            return middle;
-        }else if( target > nums[middle] ){
-            if( nums[middle] > nums[start] ){
-                return searchFromRange( nums , target ,  middle + 1 , end , pivot );
+        int pivot = lo;
+        int start ; int end;
+        if( pivot > 0 ){
+            if( target > nums[0] ){
+                start = 0;
+                end = pivot - 1;
             }else{
-                int left = searchFromRange( nums , target , middle + 1 , end , pivot );
-                int right = searchFromRange( nums , target , start, middle -1, pivot );
-                if( left!= -1){
-                    return left;
-                }else{
-                    return right;
-                }
+                start = pivot;
+                end = nums.length - 1;
             }
         }else{
-            if( !pivot ){
-                return searchFromRange( nums , target ,  start , middle - 1 , pivot );
-            }else{
-                int left = searchFromRange( nums , target , middle + 1 , end , pivot );
-                int right = searchFromRange( nums , target , start, middle -1, pivot );
-                if( left!= -1){
-                    return left;
-                }else{
-                    return right;
-                }
-            }
+            start = 0;
+            end = nums.length - 1;
         }
-    }
-
-    public int search(int[] nums, int target) {
-        return searchFromRange(nums , target , 0 , nums.length-1 , true );
+        while( start <= end ){
+            int mid = ( start + end )/2;
+            if( target < nums[mid] ) end = mid - 1;
+            else if( target == nums[mid] ) return mid;
+            else start = mid + 1;
+        }
+        return -1;
     }
 }

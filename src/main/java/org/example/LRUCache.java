@@ -3,55 +3,84 @@ package org.example;
 import java.util.*;
 
 public class LRUCache {
-    ArrayList<Integer> order;
-    Map<Integer , Integer> map;
 
-    Map<Integer , Integer> opsMap;
-    int capacity;
+    public class LinkNode{
+        public int key;
+        public int value;
+        public LinkNode pre = null;
+        public LinkNode post = null;
+        LinkNode(int key ,int value ){
+            this.value = value;
+            this.key = key;
+        }
 
-    int ops;
+    }
+    int capacity ;
+    LinkNode head = null;
+    LinkNode tail = null;
 
-    int lastLacation = 0;
+    private void addNode( LinkNode node ){
+        if( head == null ){
+            tail = node;
+        }else{
+            head.pre = node;
+            node.post = head;
+        }
+        head = node;
+    }
 
-    //Map<Integer , Integer> keyLocation
+    private void moveToHead(LinkNode node){
+        if( !node.equals(head) ){
+            LinkNode pre = node.pre;
+            LinkNode post = null;
+            if(node.post != null ) {
+                post = node.post;
+                post.pre = pre;
+            }
+            pre.post = post;
+            node.pre = null;node.post=null;
+            if(tail.equals(node)) tail = pre;
+            addNode( node );
+        }
+    }
 
+    private LinkNode removeLast( ){
+        if( tail != null){
+            LinkNode remove = tail;
+            tail = tail.pre;
+            if( tail == null ) head = null;
+            else tail.post = null;
+            remove.pre = null;
+            return remove;
+        }
+        return null;
+    }
 
+    HashMap<Integer , LinkNode> map;
     public LRUCache(int capacity) {
         this.capacity = capacity;
-        this.order = new ArrayList<>();
-        this.map = new HashMap<>();
-        this.opsMap = new HashMap<>();
+        map = new HashMap<>();
     }
 
     public int get(int key) {
-        if( map.keySet().contains( key ) ){
-            ops++;
-            opsMap.replace( key , ops );
-            order.add( key );
-            return map.get(key);
-        }else{
-            //order.addLast( key );
-            return -1;
-        }
+        if(  map.get(key)!=null ) moveToHead( map.get(key) );
+        else return -1;
+        return map.get(key).value;
     }
 
     public void put(int key, int value) {
-        ops++;
-        if( map.keySet().size() == capacity && !map.keySet().contains( key )){
-            for( int i = lastLacation  ; i < order.size() ; i++ ){
-                if( opsMap.get( order.get(i) ) != null){
-                    if( i + 1 == opsMap.get( order.get(i) )){
-                        lastLacation = i;
-                        break;
-                    }
-                }
-            }
-            opsMap.remove( order.get( lastLacation ) );
-            map.remove( order.get( lastLacation ) );
-            lastLacation++;
+        LinkNode node = map.get(key);
+        if( node == null ) {
+            node = new LinkNode( key , value );
+            addNode( node );
+        }else node.value = value;
+        map.put( key , node );
+        if( map.keySet().size() > capacity){
+            LinkNode last = removeLast();
+            //System.out.println( last.key );
+            map.remove( last.key );
+        }else{
+            moveToHead( node );
         }
-        opsMap.put(key , ops);
-        order.add( key );
-        map.put( key , value );
     }
 }

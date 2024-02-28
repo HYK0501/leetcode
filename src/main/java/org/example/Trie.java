@@ -4,74 +4,52 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Trie {
+    public class TNode{
+        public TNode[] nextNodes;
+        public boolean end = false;
 
-    class Node {
-        public char val;
-        public Map<Character , Node> neighbors;
-        boolean end = false;
-
-        public Node() {
-            neighbors = new HashMap<Character , Node>();
-        }
-        public Node(char _val) {
-            val = _val;
-            neighbors = new HashMap<Character ,Trie.Node>();
-        }
-        public Node(char _val, HashMap<Character ,Trie.Node> _neighbors) {
-            val = _val;
-            neighbors = _neighbors;
-        }
-        public void setEnd(){
-            this.end = true;
+        public TNode() {
+            nextNodes = new TNode[26];
         }
     }
 
-    Node root;
-
+    TNode[] firsts;
     public Trie() {
-        this.root = new Node();
-        //System.out.println(root);
+        firsts = new TNode[26];
     }
 
     public void insert(String word) {
-        Node now = null;
-        Node temp = this.root;
-        //System.out.println( this.root );
-
-        for(int i = 0 ; i < word.length() ; i++){
-            //System.out.println(i);
-            now = temp.neighbors.get( word.charAt(i) );
-            if( now == null ){
-                now = new Node( word.charAt(i) );
-                temp.neighbors.put( word.charAt(i) , now );
+        TNode[] temp = firsts;
+        TNode node = null;
+        for( int i = 0 ; i < word.length() ; i++){
+            node = temp[word.charAt(i) - 'a'];
+            if( node == null ){
+                node = new TNode();
+                temp[word.charAt(i) - 'a'] = node;
             }
-            temp = now;
+            temp = node.nextNodes;
         }
-        now.setEnd();
+        node.end = true;
     }
 
     public boolean search(String word) {
-        Node now = null;
-        Node temp = this.root;
-        for(int i = 0 ; i < word.length() ; i++){
-            now = temp.neighbors.get( word.charAt(i) );
-            if( now == null ){
-                return false;
-            }
-            temp = now;
+        TNode[] temp = firsts;
+        TNode node = null;
+        for( int i = 0 ; i < word.length() ; i++){
+            node = temp[word.charAt(i) - 'a'];
+            if( node == null ) return false;
+            temp = node.nextNodes;
         }
-        return temp.end;
+        return node.end;
     }
 
     public boolean startsWith(String prefix) {
-        Node now = null;
-        Node temp = this.root;
-        for(int i = 0 ; i < prefix.length() ; i++){
-            now = temp.neighbors.get( prefix.charAt(i) );
-            if( now == null ){
-                return false;
-            }
-            temp = now;
+        TNode[] temp = firsts;
+        TNode node = null;
+        for( int i = 0 ; i < prefix.length() ; i++){
+            node = temp[prefix.charAt(i) - 'a'];
+            if( node == null ) return false;
+            temp = node.nextNodes;
         }
         return true;
     }

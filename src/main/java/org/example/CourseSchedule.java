@@ -3,54 +3,23 @@ package org.example;
 import java.util.*;
 
 public class CourseSchedule {
-    public boolean dfs( LinkedList<Integer> stack , Set<Integer> visited , int point ,  Map<Integer , HashSet<Integer>> graph){
-        HashSet<Integer> nexts = graph.get( point );
-        stack.addLast( point );
-        if(nexts == null){
-            stack.removeLast();
-            return true;
-        }
-        for( Integer next : nexts ){
-            if( stack.contains( next ) ){
-                return false;
-            }else{
-                if( !visited.contains( next ) ){
-                    boolean pointRes = dfs( stack , visited , next , graph);
-                    if(!pointRes){
-                        return false;
-                    }
-                }
-            }
-        }
-        stack.removeLast();
-        visited.add( point );
-        return true;
-    }
 
     public boolean canFinish(int numCourses, int[][] prerequisites) {
-        //point to it's prerequisites
-        Map<Integer , HashSet<Integer>> pointAndNext = new HashMap<>();
-        for( int i = 0 ; i < prerequisites.length ; i++ ){
-            if( pointAndNext.keySet().contains(prerequisites[i][0]) ){
-                Set<Integer> nexts = pointAndNext.get( prerequisites[i][0] );
-                nexts.add( prerequisites[i][1] );
-            }else{
-                HashSet<Integer> nexts = new HashSet<>();
-                nexts.add( prerequisites[i][1] );
-                pointAndNext.put( prerequisites[i][0] , nexts);
+        ArrayList<Integer> finishCourses = new ArrayList<>();
+        int[] degrees = new int[ numCourses ];
+        Map<Integer , List<Integer>> map = new HashMap<>();
+        for( int i = 0 ; i < prerequisites.length ; i++ ) {
+            degrees[ prerequisites[i][1] ]++;
+            if( map.get( prerequisites[i][0] ) == null ) map.put(prerequisites[i][0], new ArrayList<>() );
+            map.get( prerequisites[i][0] ).add( prerequisites[i][1] );
+        }
+        for( int i = 0 ; i < numCourses ; i++ ) if( degrees[i] == 0 ) finishCourses.add( i );
+        for( int i = 0 ; i < finishCourses.size() ; i++){
+            for( Integer next : map.get( finishCourses.get(i) ) ) {
+                degrees[next]--;
+                if( degrees[next] == 0 ) finishCourses.add( next );
             }
         }
-        LinkedList<Integer> stack = new LinkedList<>();
-        HashSet<Integer> visited = new HashSet<>();
-        for( Integer point : pointAndNext.keySet() ){
-            if( !visited.contains(point) ){
-                boolean res = dfs( stack , visited , point , pointAndNext);
-                if(!res){
-                    return res;
-                }
-                stack.clear();
-            }
-        }
-        return true;
+        return finishCourses.size() == numCourses;
     }
 }

@@ -1,50 +1,29 @@
 package org.example;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class mergeIntervals {
     public int[][] merge(int[][] intervals) {
-        ArrayList<int[]> resList = new ArrayList<>();
-        for(int i = 0 ; i < intervals.length ; i++){
-            if( resList.isEmpty() ){
-                resList.add( intervals[i] );
-            }else{
-                List<int[]> overlapArrays = new ArrayList<>();
-                for(int[] temp : resList){
-                    if( !(temp[0] > intervals[i][1] || temp[1] < intervals[i][0]) ){
-                        overlapArrays.add(temp);
-                    }
-                }
-                if( !overlapArrays.isEmpty()){
-                    resList.removeAll( overlapArrays );
-                    int[] newArray = new int[2];
-                    int max = -1;
-                    int min = 10001;
-                    for( int[] temp : overlapArrays ){
-                        if( temp[0] < min ){
-                            min = temp[0];
-                        }
-                        if( temp[1] > max){
-                            max = temp[1];
-                        }
-                    }
-                    newArray[0] = min;
-                    newArray[1] = max;
-                    resList.add( newArray );
-                }else{
-                    resList.add( intervals[i] );
+        Arrays.sort(intervals, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] ints, int[] t1) {
+                if( ints[0] != t1[0]) return ints[0] - t1[0];
+                else return ints[1] - t1[1];
+            }
+        });
+        LinkedList<int[]> res = new LinkedList<>();
+        for( int i = 0 ; i < intervals.length ; i++){
+            if( res.isEmpty() ) res.add( intervals[i] );
+            else{
+                if( res.getLast()[1] <= intervals[i][0] ){
+                    int[] last = res.removeLast();
+                    int[] temp = new int[]{ Math.min( last[0] , intervals[i][0] ) , Math.max( last[1] , intervals[i][1] )  };
+                    res.add( temp );
                 }
             }
         }
-        int[][] res = new int[ resList.size() ][2];
-        int index = 0;
-        for( int[] temp : resList ){
-            res[index][0] = temp[0];
-            res[index][1] = temp[1];
-            index++;
-        }
-        return res;
-        //return resList.toArray(int[]::new);
+        int[][] resArray = new int[ res.size() ][2];
+        for( int i = 0 ; i < resArray.length ; i++) resArray[i] = res.removeFirst();
+        return resArray;
     }
 }

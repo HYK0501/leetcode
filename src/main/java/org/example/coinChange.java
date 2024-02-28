@@ -7,36 +7,24 @@ import java.util.Collections;
 public class coinChange {
 
     public int coinChange(int[] coins, int amount) {
-        Arrays.sort(coins);
-        if( amount == 0){
-            return 0;
+        int[] res = new int[ amount + 1];
+        Arrays.sort( coins );
+        res[0] = 0;
+        for( int i = 1 ; i < amount + 1 ; i++ ) res[i] = -1;
+        for( int i = 0 ; i < coins.length ; i++){
+            if( coins[i] <= amount) res[ coins[i] ] = 1;
+            else break;
         }
-        else if(amount % coins[coins.length-1] == 0){
-            return amount / coins[coins.length-1];
-        }else{
-            int[] res = new int[amount];
-            for( int i = 0 ; i < amount ; i++){
-                res[i] = -1;
-                for( int j = 0 ; j < coins.length ; j++){
-                    if( i + 1 == coins[j]){
-                        res[i] = 1;
-                    }else if( i+1 < coins[j] ){
-                        break;
-                    }else{
-                        int temp = 1 + res[ i - coins[j] ];
-                        if( temp != 0 ){
-                            if( res[i] == -1){
-                                res[i] = temp;
-                            }
-                            //res[i] = temp;
-                            else if( res[i] > temp  ){
-                                res[i] = temp;
-                            }
-                        }
+        for( int i = 0 ; i < amount + 1 ; i++ ){
+            for( int j = 0 ; j < coins.length ; j++ ){
+                if( coins[j] <= i){
+                    if( i - coins[j] > 0 ){
+                        if( res[i] > 0 &&  res[ i - coins[j] ] > 0) res[i] = Math.min( res[i] , res[ i - coins[j] ] + 1 );
+                        else if( res[ i - coins[j] ] > 0 ) res[i] = res[ i - coins[j] ] + 1;
                     }
-                }
+                }else break;
             }
-            return res[amount-1];
         }
+        return res[ amount ];
     }
 }

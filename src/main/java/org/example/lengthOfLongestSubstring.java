@@ -1,45 +1,20 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 
 public class lengthOfLongestSubstring {
     public int lengthOfLongestSubstring(String s) {
         int max = 0;
-        //int beginLocation = 0;
-        int temp = 0;
-        ArrayList<Character> characters = new ArrayList<>();
+        HashSet<Character> set = new HashSet<>();
+        LinkedList<Character> queue = new LinkedList<>();
         for(int i = 0 ; i < s.length() ; i++){
-            if( !characters.contains( s.charAt(i) ) ){
-                temp++;
-            }else{
-                //if( temp > max ){
-                boolean add = false;
-                int removeLength = 0;
-                ArrayList<Character> tempChars = new ArrayList<>();
-                for( int j = 0 ; j < characters.size() ; j++){
-                    if( add ){
-                        tempChars.add( characters.get(j) );
-                    }else{
-                        removeLength++;
-                    }
-                    if( characters.get(j).equals( s.charAt(i) ) ){
-                        add = true;
-                    }
-                }
-                if( temp > max ){
-                    max = temp;
-                }
-                temp = temp - removeLength + 1;
-                characters = tempChars;
-            }
-            characters.add( s.charAt(i) );
-        }
-
-        if( temp > max){
-            //beginLocation = s.length() - temp;;
-            max = temp;
+            while( set.contains( s.charAt(i) ) ) set.remove( queue.removeFirst()  );
+            set.add( s.charAt(i) );
+            queue.add( s.charAt(i) );
+            if( queue.size() > max ) max = queue.size();
         }
         return max;
-
     }
 }

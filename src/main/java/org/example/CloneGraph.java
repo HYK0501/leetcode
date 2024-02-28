@@ -21,56 +21,27 @@ public class CloneGraph {
         }
     }
 
-    public void copy(Node originNode  ,Node node , Map<Node , Node> cloneMap){
-        Set<Node> set = node.neighbors.stream().collect(Collectors.toSet());
-        for( Node neigh : originNode.neighbors ){
-            Node neighCopy = null;
-            if( cloneMap.get(neigh) == null ){
-                neighCopy = new Node( neigh.val );
-                cloneMap.put( neigh , neighCopy);
-            }else{
-                neighCopy = cloneMap.get( neigh );
-            }
-            if( !set.contains(neighCopy) ){
-                node.neighbors.add( neigh );
-                neighCopy.neighbors.add( node );
-            }
-        }
+    Node[] nodes;
 
-        for( Node neigh : originNode.neighbors ){
-            Node neighCopy = cloneMap.get( neigh );
-            if( !set.contains(neighCopy) ){
-                copy( neigh , neighCopy , cloneMap );
+    public void dfs( Node node , Node originNode){
+        nodes[ node.val - 1 ] = node;
+        for( Node child : originNode.neighbors ){
+            Node newNode = nodes[ child.val - 1 ];
+            if( newNode == null ) {
+                newNode = new Node( child.val );
+                dfs( newNode , child );
             }
+            node.neighbors.add( newNode );
         }
     }
 
-    public Node cloneGraph(Node node) {
-        Map<Node , Node> cloneMap = new HashMap<>();
-        if( node == null){
-            return null;
-        }
-        else if( node.neighbors.isEmpty() ){
-            return new Node();
-        }
-        Node nodeCopy = new Node( node.val );
-        cloneMap.put(node , nodeCopy);
-        for( Node neigh : node.neighbors ){
-            Node neighCopy = null;
-            if( cloneMap.get(neigh) == null ){
-                neighCopy = new Node( neigh.val );
-                cloneMap.put( neigh , neighCopy);
-            }else{
-                neighCopy = cloneMap.get( neigh );
-            }
-            nodeCopy.neighbors.add( neighCopy );
-            neighCopy.neighbors.add( nodeCopy );
-        }
 
-        for( Node neigh : node.neighbors ){
-            Node neighCopy = cloneMap.get( neigh );
-            copy( neigh , neighCopy , cloneMap );
-        }
-        return nodeCopy;
+    public Node cloneGraph(Node node) {
+        nodes = new Node[100];
+        Node root = null;
+        if( node != null ) root = new Node(node.val);
+        else return node;
+        dfs( root , node );
+        return root;
     }
 }

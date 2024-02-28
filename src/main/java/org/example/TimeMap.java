@@ -3,55 +3,41 @@ package org.example;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 class TimeMap {
-    //sol sol
-    HashMap<String , HashMap<Integer , String>> storeMap;
-    HashMap<String , List<Integer> > timeRecords;
+    Map<String , String> valueMap;
+    Map<String ,ArrayList<Integer>> timeStamps;
     public TimeMap() {
-        storeMap = new HashMap<>();
-        timeRecords = new HashMap<>();
+        valueMap = new HashMap<>();
+        timeStamps = new HashMap<>();
     }
 
     public void set(String key, String value, int timestamp) {
-        if( storeMap.get(key) != null){
-            storeMap.get(key).put( timestamp , value );
-            timeRecords.get(key).add( timestamp );
-        }else{
-            ArrayList<Integer> times = new ArrayList<>();
-            HashMap<Integer , String> values = new HashMap<>();
-            values.put( timestamp , value );
-            storeMap.put( key , values);
-            times.add( timestamp );
-            timeRecords.put( key , times);
-        }
+        valueMap.put( key + timestamp , value );
+        if( timeStamps.get(key) == null) timeStamps.put( key , new ArrayList<>() );
+        timeStamps.get( key ).add( timestamp );
     }
 
     public String get(String key, int timestamp) {
-        HashMap<Integer , String> values = storeMap.get( key );
-        if( values == null){
-            return "";
-        }else{
-            List<Integer> times = timeRecords.get( key );
-            int low = 0;
-            int upper = times.size() - 1;
-            int cand = -1;
-            while( low <= upper ){
-                int mid = ( low + upper )/2;
-                if( times.get(mid) == timestamp ){
-                    return values.get( timestamp );
-                }else if( times.get(mid) > timestamp ){
-                    upper = mid - 1;
-                }else if( times.get( mid ) < timestamp ){
-                    cand = times.get(mid);
-                    low = mid + 1;
-                }
+        ArrayList<Integer> times = timeStamps.get(key);
+        if( times == null ) return "";
+        if( timestamp < times.get(0) ) return "";
+        int lo = 0;
+        int hi = times.size() - 1;
+        while( lo < hi ){
+            // auto up 1
+            int mid = lo + ( hi - lo + 1)/2;
+            if( timestamp > times.get( mid ) ) lo = mid;
+            else if( timestamp == times.get( mid ) ){
+                lo = mid;
+                break;
+            }else{
+                // down 1
+                hi = mid - 1;
             }
-            if( cand != -1){
-                return values.get( cand );
-            }
-            return "";
         }
+        return valueMap.get( key + times.get(lo));
     }
 }
