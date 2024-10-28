@@ -9,82 +9,55 @@ public class SortList {
         ListNode(int val) { this.val = val; }
         ListNode(int val, ListNode next) { this.val = val; this.next = next; }
     }
-
-    public class subList{
-        ListNode head;
-        ListNode tail;
-        subList() {}
-        subList( ListNode head , ListNode tail){
-            this.head = head;
-            this.tail = tail;
-        }
+    public void connect( ListNode preNode , ListNode[] sub ){
+        preNode.next = sub[0];
+        sub[0] = sub[0].next;
     }
-
-    public ListNode getMiddle(ListNode head){
-        ListNode middle = null;
-        if( head.next.next == null){  middle = head.next; head.next = null; }
-        else{
-            ListNode slow = head.next; ListNode fast = head.next.next;ListNode preNode = head;
-            while( fast != null){
-                if( fast.next == null)break;
-                else{
-                    fast = fast.next.next;
-                    preNode = slow;
-                    slow = slow.next;
-                }
-            }
-            preNode.next = slow.next;
-            slow.next = null;
-            middle = slow;
-        }
-        return middle;
-    }
-
-    public subList sort( ListNode head ){
-        if( head == null) return new subList(null , null);
-        if( head.next == null){
-            return new subList( head , head );
-        }else{
-            ListNode bigHead = null; ListNode bigTail = null; ListNode smallHead = null; ListNode smallTail = null;
-            ListNode middle = getMiddle(head);
-            ListNode temp = head;
-            while( temp != null ){
-                if( temp.val >= middle.val ){
-                    if( bigHead == null){
-                        bigHead = temp;bigTail=temp;
-                    }else{
-                        bigTail.next = temp; bigTail = bigTail.next;
-                    }
-                    temp = temp.next;
-                    bigTail.next = null;
-                }else{
-                    if( smallHead == null ){
-                        smallHead = temp;smallTail = temp;
-                    }else{
-                        smallTail.next = temp; smallTail = smallTail.next;
-                    }
-                    temp = temp.next;
-                    smallTail.next = null;
-                }
-            }
-            subList bigList = null; subList smallList = null;subList newList = new subList( head , head );
-            if( smallHead != null){
-                smallList = sort( smallHead );
-                smallList.tail.next = middle;
-                newList.head = smallList.head;
-            }
-            if( bigHead != null){
-                bigList = sort( bigHead );
-                middle.next = bigList.head;
-                newList.tail = bigList.tail;
-            }
-            return newList;
-        }
-    }
-
-
+    //java 的參數是傳 ref 的 copy basic type just value copy
     public ListNode sortList(ListNode head) {
-        subList res = sort( head );
-        return res.head;
+        int len = 0;
+        ListNode temp = head;
+        while( temp!=null ){
+            temp = temp.next;
+            len++;
+        }
+        ListNode dummy = new ListNode( -1 , head );
+        for( int step = 1 ; step < len ; step=step*2 ){
+            ListNode preNode = dummy;
+            ListNode next = dummy.next;
+            while( next!=null ){
+                ListNode[] subOne = new ListNode[2];
+                ListNode[] subTwo = new ListNode[2];
+
+                for( int i = 0 ; i < 2 ; i++){
+                    int subLen = 0;
+                    if( i==0 ) subOne[0] = next;
+                    else subTwo[0] = next;
+                    while( next!= null && subLen < step ){
+                        subLen++;
+                        if( i==0 ) subOne[1] = next;
+                        else subTwo[1] = next;
+                        next = next.next;
+                    }
+                }
+                if( subOne[1] != null ) subOne[1].next = null;
+                if( subTwo[1] != null ) subTwo[1].next = null;
+                //System.out.println( subTwo[0].val );
+                while( subOne[0] != null && subTwo[0] != null ){
+                    if( subOne[0].val < subTwo[0].val ) connect( preNode , subOne );
+                    else connect( preNode , subTwo );
+                    preNode = preNode.next;
+                    preNode.next = null;
+                }
+                if( subOne[0] != null ){
+                    preNode.next = subOne[0];
+                    preNode = subOne[1];
+                }else{
+                    preNode.next = subTwo[0];
+                    preNode = subTwo[1];
+                }
+            }
+        }
+        return dummy.next;
     }
 }

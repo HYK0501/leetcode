@@ -1,34 +1,38 @@
 package org.example;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 public class MaximumWidthofBinaryTree {
-    public int widthOfBinaryTree(TreeNode root) {
-        Map<Long , TreeNode> indexMap = new HashMap<>();
-        long max = 1;long start;long end;
-        if(root!=null)indexMap.put( 0L,root );
-        while( true  ){
-            start = Long.MAX_VALUE;end =Long.MIN_VALUE;
-            Map<Long , TreeNode> nextIndexMap = new HashMap<>();
-            for( Long key : indexMap.keySet() ){
-                TreeNode node = indexMap.get( key );
-                if( node.left != null ){
-                    if( 2*key < start ) start = 2*key;
-                    if( end < 2*key) end = 2*key;
-                    nextIndexMap.put( 2*key , node.left);
-                }
-                if( node.right != null ){
-                    if( 2*key+1 < start ) start = 2*key+1;
-                    if( end < 2*key+1) end = 2*key+1;
-                    nextIndexMap.put( 2*key + 1, node.right);
-                }
-            }
-            indexMap = nextIndexMap;
-            if( indexMap.isEmpty() ) break;
-            if( max < end - start +1) max = end - start +1;
+    class pair{
+        TreeNode node;
+        int index;
+        pair(int index , TreeNode node ){
+            this.index = index;
+            this.node = node;
         }
-        return (int)max;
+    }
+    public int widthOfBinaryTree(TreeNode root) {
+        LinkedList<pair> list = new LinkedList<>();
+        list.add( new pair( 0 , root) );
+        int res = 1;
+        while( !list.isEmpty() ){
+            int shift = 0;
+            LinkedList<pair> nextList = new LinkedList<>();
+            int subOne = 0;
+            for( pair p : list ){
+                if( ( p.node.left!= null || p.node.right!=null ) && nextList.isEmpty()) {
+                    shift = p.index;
+                    if( p.node.left== null ) subOne = -1;
+                }
+                if( p.node.left!= null ) nextList.add( new pair( 2*(p.index - shift ) + subOne , p.node.left) );
+                if( p.node.right!= null ) nextList.add( new pair( 2*(p.index - shift ) + 1 + subOne , p.node.right) );
+                res = Math.max( res , p.index+1 );
+            }
+            list = nextList;
+        }
+        return res;
     }
 }
 

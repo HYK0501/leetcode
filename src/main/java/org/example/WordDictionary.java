@@ -3,73 +3,53 @@ package org.example;
 import java.util.*;
 
 public class WordDictionary {
-    public class ChNode{
-        ChNode[] nextNodes;
-        Character ch;
-        boolean end = false;
+    CNode[] root;
+    public class CNode {
+        CNode[] nexts;
+        boolean end;
 
-        public ChNode(char ch){
-            this.ch = ch;
-            nextNodes = new ChNode[26];
-        }
-
-        public void addNext( ChNode nextNode ){
-            nextNodes[nextNode.ch - 'a'] = nextNode;
+        CNode(){
+            nexts = new CNode[26];
+            end = false;
         }
     }
-
-    ChNode[] nodeMap;
-
     public WordDictionary() {
-        nodeMap = new ChNode[26];
+        root = new CNode[26];
     }
 
     public void addWord(String word) {
-        int index = 0;
-        ChNode[] map = nodeMap;
-        ChNode nextNode =  nodeMap[word.charAt(index) - 'a'];
-        while( nextNode != null ){
-            index++;
-            map = nextNode.nextNodes;
-            if( index == word.length() ) break;
-            nextNode = nextNode.nextNodes[word.charAt(index) - 'a'];
+        CNode[] nowLevel = root;
+        CNode node = null;
+        for( int i = 0 ; i < word.length() ; i++ ){
+            if( nowLevel[ word.charAt(i) - 'a' ] == null ) nowLevel[ word.charAt(i) - 'a' ] = new CNode();
+            node = nowLevel[ word.charAt(i) - 'a' ];
+            nowLevel = node.nexts;
         }
-        ChNode newNode = nextNode;
-        for( int i = index ; i < word.length() ; i++ ){
-            newNode = new ChNode( word.charAt(i) );
-            map[newNode.ch - 'a'] = newNode;
-            map = newNode.nextNodes;
-        }
-        newNode.end = true;
+        node.end = true;
     }
 
-    public boolean search( ChNode[] nodeMap , String str , int index ){
-        if( str.charAt(index) != '.' ){
-            ChNode nextNode = nodeMap[str.charAt(index) - 'a'];
-            if( nextNode == null ){
+    public boolean search( String word , int index , CNode[] level ){
+        if( index == word.length()-1 ){
+            if( word.charAt(index) == '.' ){
+                for( int i = 0 ; i < 26 ; i++ ) if( level[i] != null ) if( level[i].end ) return true;
                 return false;
             }else{
-                if( index == str.length()-1 ) {
-                    if( nextNode.end ) return true;
-                    else return false;
-                }
-                return search( nextNode.nextNodes , str , index+1 );
+                return level[ word.charAt(index) - 'a' ] == null ? false : level[ word.charAt(index) - 'a' ].end;
             }
         }else{
-            ChNode nextNode;
-            for( int i = 0 ; i < 26 ; i++){
-                nextNode = nodeMap[i];
-                if( nextNode != null) {
-                    if (index == str.length() - 1) {
-                        if (nextNode.end) return true;
-                    } else if (search(nextNode.nextNodes, str, index + 1)) return true;
+            if( word.charAt(index) == '.' ){
+                for( int i = 0 ; i < 26 ; i++ )
+                    if( level[i] != null ){
+                        if( search( word , index+1 , level[i].nexts ) ) return true;
                 }
+                return false;
+            }else{
+                return level[ word.charAt(index) - 'a' ] == null ? false : search( word , index+1 , level[ word.charAt(index) - 'a' ].nexts );
             }
-            return false;
         }
     }
 
     public boolean search(String word) {
-        return search( nodeMap , word , 0 );
+        return search( word , 0 , root );
     }
 }

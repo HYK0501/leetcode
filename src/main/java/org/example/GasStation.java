@@ -1,28 +1,26 @@
 package org.example;
 
 public class GasStation {
+
     public int canCompleteCircuit(int[] gas, int[] cost) {
-        int[] mins = new int[gas.length]; //from 0 to i min
-        int[] accs = new int[gas.length];int min = 0; int mostMin = 0;int acc = 0;
-        for( int i = 0 ; i < gas.length ; i++){
-            min = min + gas[i] - cost[i];
-            acc = acc + gas[ gas.length - 1 - i ] - cost[ gas.length - 1 -i ];
-            accs[ gas.length - 1 - i ] = acc;
-            if( mostMin > min ){
-                mostMin = min;
+        int start = 0;
+        int acc = 0;
+        int totalAcc = 0;
+        int[] mins = new int[gas.length];
+        mins[0] = gas[0] - cost[0];
+        for( int i = 0 ; i < gas.length ; i++ ){
+            acc = acc + gas[i] - cost[i];
+            totalAcc = totalAcc + gas[i] - cost[i];
+            if( i>0 ) mins[i] = Math.min( mins[i-1] , totalAcc );
+            if( acc < 0 ){
+                acc = 0;
+                start = i+1;
             }
-            mins[i] = mostMin;
+
         }
-        if( mins[ gas.length - 1 ] >= 0 ){
-            return 0;
-        }else{
-            int res = -1;
-            for( int i = 1 ; i < gas.length ; i++){
-                if( -mins[i - 1] <= accs[i] && gas[i] >= cost[i] ){
-                    res = i;
-                }
-            }
-            return res;
-        }
+        if( start == gas.length ) return -1;
+        if(start == 0) return 0;
+        else if( acc >= -mins[ start -1 ] ) return start;
+        return -1;
     }
 }

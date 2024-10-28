@@ -1,79 +1,32 @@
 package org.example;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+
 public class myAtoi {
     public int myAtoi(String s) {
-        if( s.isEmpty() ){
+        int index = 0;
+        boolean negative = false;
+        try{
+            while( s.charAt(index) == ' ' ) index++;
+            while( s.charAt(index) == '+' || s.charAt(index) == '-' ){
+                if( s.charAt(index) == '-' ) negative = true;
+                index++;
+                break;
+            }
+            while( s.charAt(index) == '0' ) index++;
+            int res = 0;
+            for( int i = index ; i < s.length() ; i++ ){
+                int digit = s.charAt(i) - '0';
+                if( digit < 0 || digit > 9 ) break;
+                else if( ( res > Integer.MAX_VALUE/10 || res == Integer.MAX_VALUE/10 && digit >= 7 ) && !negative ) return Integer.MAX_VALUE;
+                else if( ( -res < Integer.MIN_VALUE/10 ||  -res == Integer.MIN_VALUE/10 && digit >= 8 ) && negative  ) return Integer.MIN_VALUE;
+                res = res*10 + ( digit );
+            }
+            if( negative ) res = res*-1;
+            return res;
+        }catch( StringIndexOutOfBoundsException e){
             return 0;
         }
-        int res = 0;
-        int ignore = 0;
-        for(int i = 0  ; i < s.length() ; i++){
-            if( s.charAt(i) == ' ' ){
-                ignore++;
-            }else{
-                break;
-            }
-        }
-        s = s.substring( ignore );
-        boolean negative = false;
-
-        if( s.charAt(0) == '-' ){
-            negative = true;
-            s = s.substring( 1 );
-        }else if( s.charAt(0) == '+'){
-            s = s.substring( 1 );
-        }
-
-        int nonDigit = 0;
-        for(int i = 0  ; i < s.length() ; i++){
-            int digit = s.charAt(i) - '0';
-            if( ! ( digit < 10 && digit > -1) ){
-                nonDigit = i;
-                break;
-            }
-        }
-        s = s.substring( 0 , nonDigit );
-        int ignoreZero = 0;
-        for(int i = 0  ; i < s.length() ; i++){
-            if( s.charAt(i) == '0' ){
-                ignoreZero++;
-            }else{
-                break;
-            }
-        }
-        s = s.substring( ignoreZero );
-
-        if( negative ){
-           String min = Integer.toString( Integer.MIN_VALUE );
-           int len = min.length() - 1;
-           if( len < s.length()){
-               return Integer.MIN_VALUE;
-           }else if(len == s.length() ){
-               for( int i = s.length()-1 ; i > -1 ; i--){
-                   if( s.charAt(i) > min.charAt(i) ){
-                       return Integer.MIN_VALUE;
-                   }
-               }
-           }
-        }else{
-            String max = Integer.toString( Integer.MAX_VALUE );
-            int len = max.length();
-            if( len < s.length()){
-                return Integer.MAX_VALUE;
-            }else if(len == s.length() ){
-                for( int i = s.length()-1 ; i > -1 ; i--){
-                    if( s.charAt(i) > max.charAt(i) ){
-                        return Integer.MAX_VALUE;
-                    }
-                }
-            }
-        }
-
-        for(int i = 0 ; i < s.length() ; i++){
-            res = res*10;
-            int digit = s.charAt(i) - '0';
-            res = res + digit;
-        }
-        return res;
     }
 }

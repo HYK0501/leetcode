@@ -1,41 +1,32 @@
 package org.example;
 
 public class nextPermutation {
-    class Solution {
-        public void nextPermutation(int[] nums) {
-            int swapStartDigit = nums.length - 2;
-            if( nums.length > 1){
-                for(int i = nums.length - 1 ; i > 0 ; i--){
-                    if( nums[i] <= nums[i-1] ){
-                        swapStartDigit = i-2;
-                    }else{
-                        break;
-                    }
-                }
-                if( swapStartDigit != -1 ){
-                    int smallestBig = -1;
-                    for( int i = swapStartDigit + 1 ; i < nums.length ; i++){
-                        if( nums[i] > nums[ swapStartDigit ] ){
-                            smallestBig = i;
-                        }
-                    }
-                    if( smallestBig != -1){
-                        int temp = nums[swapStartDigit];
-                        nums[swapStartDigit] = nums[smallestBig];
-                        nums[smallestBig] = temp;
-                    }
-                }
-                int right = nums.length - 1;
-                for(int i = swapStartDigit + 1 ; i < nums.length; i++  ){
-                    int temp = nums[ right ];
-                    nums[right] = nums[i];
-                    nums[i] = temp;
-                    right--;
-                    if( right<=i+1 ){
-                        break;
-                    }
+    public void swap(int[] nums , int  i , int j){
+        int temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
+    }
+    public void reverse( int[] nums , int start , int end ){
+        int len = end - start + 1;
+        for( int i = 0 ; i < len/2 ; i++ ) swap( nums , start+i , end-i );
+    }
+    public void nextPermutation(int[] nums) {
+        if( nums.length == 1) return;
+        int changePoint = -1;
+        for( int i = nums.length - 1 ; i > 0 ; i-- ) {
+            if( nums[i] > nums[i-1] ) {
+                changePoint = i - 1;
+                break;
+            }
+        }
+        if( changePoint != -1) {
+            for( int i = nums.length - 1 ; i > changePoint ; i-- ) {
+                if( nums[changePoint] < nums[i] ){
+                    swap( nums , changePoint , i );
+                    break;
                 }
             }
         }
+        reverse( nums , changePoint + 1 , nums.length - 1 );
     }
 }

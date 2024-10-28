@@ -8,27 +8,28 @@ public class SwapNodesinPairs {
       ListNode(int val) { this.val = val; }
       ListNode(int val, ListNode next) { this.val = val; this.next = next; }
   }
-
-    public ListNode swapPairs( ListNode head ) {
-        if( head.next != null){
-            ListNode temp = null;
-            temp = head.next;
-            head.next = temp.next;
-            temp.next = head;
-            head = temp;
-            ListNode prenode = head.next;
-            ListNode node = head.next;
-            while( node != null){
-                if( node.next != null){
-                    temp = node.next;
-                    node.next = temp.next;
-                    temp.next = node;
-                    prenode.next = temp;
-                }
-                prenode = node;
-                node = node.next;
-            }
-        }
-        return head;
+  public ListNode swap( ListNode node , ListNode next , ListNode next2 ){
+    if( node == null ) return node;
+    else if( next == null ) return node;
+    else{
+      next.next = node;
+      node.next = next2;
+      return next;
     }
+  }
+  public ListNode swapPairs( ListNode head ) {
+    ListNode next = head != null ? head.next : null;
+    ListNode next2 = next != null ? next.next : null;
+    head = swap( head , next , next2 );
+    ListNode preNode = head != null ? head.next : null;
+    while( next2 != null ){
+      //after swap the order is next -> node -> next2
+      ListNode node = next2;
+      next = node.next;
+      next2 = next != null ? next.next : null;
+      preNode.next = swap( node , next , next2 );
+      preNode = preNode.next.next;
+    }
+    return head;
+  }
 }

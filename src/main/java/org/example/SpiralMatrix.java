@@ -4,42 +4,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SpiralMatrix {
-
     public List<Integer> spiralOrder(int[][] matrix) {
-        int left = 0;
-        int right = matrix[0].length - 1;
-        int up = 0;
-        int bottom = matrix.length - 1;
-        boolean nextRoad = true;
-        List<Integer> res = new ArrayList<>();
-        int nowI = -1;
-        int nowJ = 0;
-        while( nextRoad ){
-
-            while( nowI + 1 <= right ){
-                nowI++;
-                res.add( matrix[nowI][nowJ] );
+        ArrayList<Integer> list = new ArrayList<>();
+        int xSteps = matrix[0].length;
+        int ySteps = matrix.length - 1;
+        int x = -1; int y = 0;
+        while( true ){
+            if( xSteps == 0 ) break;
+            for( int i = 0 ; i < xSteps ; i++  ){
+                x++;
+                list.add( matrix[y][x] );
             }
-            up++;
-            while( nowJ + 1 < bottom ){
-                nowJ++;
-                res.add( matrix[nowI][nowJ] );
+            xSteps--;
+            if( ySteps == 0 ) break;
+            for( int i = 0 ; i < ySteps ; i++ ){
+                y++;
+                list.add( matrix[y][x] );
             }
-            right--;
-            while( nowI -1 > left ){
-                nowI--;
-                res.add( matrix[nowI][nowJ] );
+            ySteps--;
+            if( xSteps == 0 ) break;
+            for( int i = 0 ; i < xSteps ; i++  ){
+                x--;
+                list.add( matrix[y][x] );
             }
-            bottom--;
-            while( nowJ -1 > up ){
-                nowJ--;
-                res.add( matrix[nowI][nowJ] );
+            xSteps--;
+            if( ySteps == 0 ) break;
+            for( int i = 0 ; i < ySteps ; i++ ){
+                y--;
+                list.add( matrix[y][x] );
             }
-            left++;
-            if( up > bottom || left > right){
-                nextRoad = false;
-            }
+            ySteps--;
         }
-        return res;
+        return list;
     }
 }

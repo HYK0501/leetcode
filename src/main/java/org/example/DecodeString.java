@@ -4,40 +4,36 @@ import java.util.LinkedList;
 
 public class DecodeString {
     public String decodeString(String s) {
-        LinkedList<Integer> operations = new LinkedList<>();
-        LinkedList<String> subStrings = new LinkedList<>();
+        LinkedList<Integer> numStack = new LinkedList<>();
+        LinkedList<String> strStack = new LinkedList<>();
+        int duplicate = -1;
         StringBuilder sb = new StringBuilder();
-        StringBuilder res = new StringBuilder();
-        for(int i = 0 ; i < s.length() ; i++){
-            if( s.charAt(i) == '[' ){
-                int number = 0;
-                int ten = 1;
-                for(int j = 1 ; j < 4 ; j++){
-                    if( i - j < 0) continue;
-                    int digit = s.charAt( i - j ) - '0';
-                    if( digit >= 0 && digit < 10 ) number = number + digit*ten;
-                    else break;
-                    ten = ten*10;
+        for( int i = 0 ; i < s.length() ; i++ ){
+            if( s.charAt(i) >= '0' && s.charAt(i) <= '9'){
+                if( duplicate == -1 ){
+                    strStack.add( sb.toString() );
+                    sb.delete( 0 , sb.length() );
+                    duplicate = s.charAt(i) - '0';
+                }else{
+                    duplicate = duplicate*10 + s.charAt(i) - '0';
                 }
-                operations.addFirst( number );
-                subStrings.addFirst( sb.toString() );
-                sb = new StringBuilder();
+            }else if( s.charAt(i) == '[' ){
+                //go to next level
+                numStack.add( duplicate );
+                duplicate = -1;
             }else if( s.charAt(i) == ']' ){
-                int repeat = operations.removeFirst();
-                String str = sb.toString();
-                for( int j = 1 ; j < repeat ; j++) sb.append(str);
-                String preSubString = subStrings.removeFirst();
-                sb = new StringBuilder( preSubString + sb.toString() );
-                if( subStrings.isEmpty() ){
-                    res.append( sb.toString() );
-                    sb = new StringBuilder();
-                }
-            }
-            else if( s.charAt(i) >= 97 &&  s.charAt(i) <= 122 ){
-                if( operations.isEmpty() ) res.append( s.charAt(i) );
-                else sb.append( s.charAt(i) );
+                //return pre level
+                String left = strStack.removeLast();
+                String right = sb.toString();
+                int num = numStack.removeLast();
+                StringBuilder merge = new StringBuilder();
+                merge.append( left );
+                for( int j = 0 ; j < num ; j++) merge.append( right );
+                sb = merge;
+            }else{
+                sb.append( s.charAt(i) );
             }
         }
-        return res.toString();
+        return strStack.isEmpty() ? sb.toString() : strStack.removeLast() + sb.toString();
     }
 }

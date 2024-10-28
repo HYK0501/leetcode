@@ -3,38 +3,19 @@ package org.example;
 import java.util.*;
 
 public class TopKFrequentWords {
+
     public List<String> topKFrequent(String[] words, int k) {
-        Map<Integer , List<String> > frenqcyToWord = new HashMap<>();
-        Map<String , Integer> wordSfrequency = new HashMap<>();
-        frenqcyToWord.put(1 , new ArrayList<>());
-        for( String word : words ){
-            Integer frequency = wordSfrequency.get( word );
-            if( frequency == null ){
-                wordSfrequency.put( word , 1 );
-                frenqcyToWord.get(1).add( word );
-            }else{
-                frenqcyToWord.get( frequency ).remove( word );
-                wordSfrequency.put( word , frequency + 1 );
-                List<String> list = frenqcyToWord.get( frequency + 1 );
-                if( list == null ){
-                    list = new ArrayList<>();
-                    frenqcyToWord.put( frequency + 1 , list );
+        HashMap<String , Integer> map = new HashMap<>();
+        for( String str : words ) map.merge( str , 1 , Integer::sum );
+        PriorityQueue< Map.Entry< String , Integer> > maxHeap = new PriorityQueue<>(
+                ( e1 , e2 ) ->{
+                   if( e2.getValue() != e1.getValue() ) return e2.getValue() - e1.getValue();
+                   else return e1.getKey().compareTo( e2.getKey() );
                 }
-                list.add( word );
-            }
-        }
-        List<String> res = new ArrayList<>();
-        List<Integer> sortedList = new ArrayList<>( frenqcyToWord.keySet() );
-        Collections.sort( sortedList  , Collections.reverseOrder());
-        for( Integer num : sortedList ){
-            Collections.sort( frenqcyToWord.get(num) );
-            for( String word : frenqcyToWord.get(num) ){
-                res.add( word );
-                if( res.size() == k ){
-                    return res;
-                }
-            }
-        }
+        );
+        ArrayList<String> res = new ArrayList<>();
+        for( Map.Entry< String , Integer> entry : map.entrySet() ) maxHeap.add( entry );
+        for( int i = 0 ; i < k ; i++ ) res.add( maxHeap.poll().getKey() );
         return res;
     }
 }

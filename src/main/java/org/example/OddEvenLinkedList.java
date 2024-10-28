@@ -8,30 +8,28 @@ public class OddEvenLinkedList {
         ListNode(int val) { this.val = val; }
         ListNode(int val, ListNode next) { this.val = val; this.next = next; }
     }
-    public ListNode oddEvenList(ListNode head) {
-        if( head == null) return null;
-        if( head.next == null) return head;
-        ListNode oddHead = head;
-        ListNode oddEnd = head;
-        ListNode evenHead = head.next;
-        ListNode evenEnd = head.next;
-        int index = 3;
-        ListNode temp = evenHead.next;
-        while( temp!=null ){
-            if( index %2 == 1){
-                oddEnd.next = temp;
-                oddEnd = oddEnd.next;
-            }else{
-                evenEnd.next = temp;
-                evenEnd = evenEnd.next;
-            }
-            temp = temp.next;
-            oddEnd.next = null;
-            evenEnd.next = null;
-            index++;
-        }
 
-        oddEnd.next = evenHead;
-        return oddHead;
+    public void remove( ListNode preNode , ListNode node , ListNode next ){
+        node.next = null;
+        preNode.next = next;
+    }
+
+    public void insert( ListNode preNode , ListNode node ){
+        ListNode next = preNode.next;
+        preNode.next = node;
+        node.next = next;
+    }
+    public ListNode oddEvenList(ListNode head) {
+        ListNode oddTail = head;
+        ListNode preNode = head != null ? head.next : null;
+        ListNode node = preNode != null ? preNode.next : null;
+        while( node != null ){
+            remove( preNode , node , node.next);
+            insert( oddTail , node );
+            oddTail = oddTail.next;
+            preNode = preNode.next;
+            node = preNode != null ? preNode.next : null;
+        }
+        return head;
     }
 }

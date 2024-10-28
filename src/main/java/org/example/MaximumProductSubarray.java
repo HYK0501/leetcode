@@ -4,32 +4,19 @@ import java.util.ArrayList;
 
 public class MaximumProductSubarray {
     public int maxProduct(int[] nums) {
-        int product = 1;//product is all number product after every zero of first
-        int max = nums[0];
-        int firstNegative = 1;
-        for( int i = 0 ; i < nums.length ; i++){
-            if( nums[i] != 0){
-                product = product*nums[i];
-                if( product < 0){
-                    if( firstNegative == 1){
-                        firstNegative = product;
-                    }else{
-                        if( max < product / firstNegative ){
-                            max = product / firstNegative;
-                        }
-                    }
-                }
-                if( product > max){
-                    max = product;
-                }
-            }else{
-                firstNegative = 1;
-                product = 1;
-                if( max < 0){
-                    max = 0;
-                }
-            }
-        }
-        return max;
+       int max = nums[0];
+       int min = nums[0];
+       int res = nums[0];
+       for(int i = 1 ; i < nums.length ; i++ ){
+           if( nums[i] < 0 ){
+               int temp = max;
+               max = min;
+               min = temp;
+           }
+           max = Math.max( nums[i] , nums[i]*max );
+           min = Math.min( nums[i] , nums[i]*min );
+           if( res < max ) res = max;
+       }
+       return res;
     }
 }

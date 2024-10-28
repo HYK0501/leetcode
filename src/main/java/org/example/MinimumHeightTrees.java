@@ -5,58 +5,36 @@ import java.util.stream.Collectors;
 
 public class MinimumHeightTrees {
     //prevent n^2 condition
-    public boolean check(Map<Integer , Integer> map){
-        for( Integer value : map.values()){
-            if( value > 1 ){
-                return false;
-            }
-        }
-        return true;
-    }
     public List<Integer> findMinHeightTrees(int n, int[][] edges) {
-        if( edges.length == 0){
-            ArrayList<Integer> points = new ArrayList<>();
-            points.add(0);
-            return points;
+        int[] degree = new int[n];
+        Map<Integer , List<Integer>> graph = new HashMap<>();
+        for( int[] edge : edges ){
+            degree[edge[0]]++;
+            degree[edge[1]]++;
+            if( graph.get( edge[0] ) == null ) graph.put( edge[0] , new ArrayList<>() );
+            if( graph.get( edge[1] ) == null ) graph.put( edge[1] , new ArrayList<>() );
+            graph.get( edge[0] ).add( edge[1] );
+            graph.get( edge[1] ).add( edge[0] );
         }
-        Map<Integer , Integer> degrees = new HashMap<>();
-        Map<Integer , Set<int[]>> relatedEdge = new HashMap<>();
-        Set<int[]> edgesSet = new HashSet<>();
-        for(int i = 0 ; i < edges.length ; i++){
-            for(int j = 0 ; j < 2 ; j++){
-                if( degrees.get( edges[i][j] ) == null  ){
-                    degrees.put( edges[i][j] , 1);
-                    relatedEdge.put( edges[i][j] , new HashSet<>());
-                    relatedEdge.get( edges[i][j] ).add( edges[i] );
-                }else{
-                    degrees.replace( edges[i][j] ,  degrees.get( edges[i][j] ) + 1 );
-                    relatedEdge.get( edges[i][j] ).add( edges[i] );
-                }
-                //edgesSet.add( edges[i] );
-            }
+        ArrayList<Integer> list = new ArrayList<>();
+        for( int i = 0 ; i < n ; i++ ){
+            if( degree[i] <= 1 ) list.add( i );
         }
-
-        //Set<Integer> remove = new HashSet<>();
-        while( !check( degrees ) ){
-            Set<Integer> remove = new HashSet<>();
-            for( Integer point : degrees.keySet() ){
-                if( degrees.get(point) == 1){
-                    remove.add( point );
-                }
-            }
-            for( Integer point :  remove ){
-                for( int[] removeEdge : relatedEdge.get( point ) ){
-                    for( int i = 0 ; i < 2 ; i++ ){
-                        if( removeEdge[i] != point ){
-                            relatedEdge.get( removeEdge[i] ).remove( removeEdge );
-                            degrees.replace(  removeEdge[i]  ,  degrees.get(  removeEdge[i]  ) -1 );
-                        }
+        while( true ){
+            ArrayList<Integer> next = new ArrayList<>();
+            for( Integer num : list){
+                if( graph.get( num ) == null ) continue;
+                for( Integer related : graph.get( num ) ){
+                    if( degree[related] > 0 ){
+                        degree[related] --;
+                        degree[ num ]--;
+                        if( degree[related] == 1 ) next.add( related );
                     }
                 }
-                degrees.remove( point );
-                relatedEdge.remove( point );
             }
+            if( next.isEmpty()) break;
+            list = next;
         }
-        return degrees.keySet().stream().collect(Collectors.toList());
+        return list;
     }
 }

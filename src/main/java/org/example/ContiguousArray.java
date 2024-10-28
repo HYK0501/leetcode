@@ -6,26 +6,14 @@ import java.util.Map;
 public class ContiguousArray {
     public int findMaxLength(int[] nums) {
         Map<Integer , Integer> valueFirstIndex = new HashMap<>();
+        int total = 0;
         int max = 0;
-        if( nums.length == 2 ){
-            if( nums[0] != nums[1] ){
-                return 2;
-            }
-        }
-        else{
-            for(int i = 0 ; i < nums.length ; i++) {
-                if (nums[i] == 0) nums[i] = -1;
-                if( i > 0 ) nums[i] = nums[i] + nums[i-1];
-                if( nums[i] == 0 ){
-                    if( i+1 > max) max = i+1;
-                }
-                if( valueFirstIndex.get( nums[i] ) == null ){
-                    valueFirstIndex.put( nums[i] , i);
-                }else{
-                    int temp = i = valueFirstIndex.get( nums[i] );
-                    if( temp > max) max = temp;
-                }
-            }
+        for( int i = 0 ; i < nums.length ; i++ ){
+            if( nums[i] == 1 ) total++;
+            else total--;
+            if( total == 0 ) max = i + 1;
+            else if( valueFirstIndex.get( total ) == null  ) valueFirstIndex.put( total , i );
+            else if( valueFirstIndex.get( total ) != null ) max = Math.max( max , i -  valueFirstIndex.get( total ) );
         }
         return max;
     }

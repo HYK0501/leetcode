@@ -7,37 +7,17 @@ import java.util.Map;
 public class dailyTemperatures {
     public int[] dailyTemperatures(int[] temperatures) {
         int[] res = new int[temperatures.length];
-        Map<Integer , LinkedList<Integer>> temperatureMapDay = new HashMap<>();
-        for( int i = 0 ; i < temperatures.length ; i++){
-            if( temperatureMapDay.get( temperatures[i] ) == null ){
-                LinkedList<Integer> list = new LinkedList<>();
-                list.addLast( i );
-                temperatureMapDay.put( temperatures[i] , list );
-            }else{
-                temperatureMapDay.get( temperatures[i] ).add(i);
-            }
-            res[i] = 1000000;
-        }
-
-        for( int i = 0 ; i < temperatures.length ; i++){
-            int locale = temperatureMapDay.get( temperatures[i] ).removeFirst();
-            for( int j = temperatures[i] + 1 ; j < 101 ; j++ ){
-                if( j > 100){
-                    break;
-                }else{
-                    if( temperatureMapDay.get( j ) != null ){
-                        if( !temperatureMapDay.get( j ).isEmpty() ){
-                            int preLocale = temperatureMapDay.get( j ).getFirst();
-                            if( preLocale - locale < res[i]){
-                                res[i] = preLocale - locale;
-                            }
-                        }
-                    }
+        LinkedList<int[]> stack = new LinkedList<>();
+        stack.add( new int[]{ temperatures[0] , 0 } );
+        for( int i = 1 ; i < temperatures.length ; i++ ){
+            while( !stack.isEmpty() ){
+                if( stack.peekLast()[0] >= temperatures[i] ) break;
+                else{
+                    int[] remove = stack.removeLast();
+                    res[ remove[1] ] = i - remove[1];
                 }
             }
-            if( res[i] == 1000000 ){
-                res[i] = 0;
-            }
+            stack.add( new int[]{ temperatures[i] , i } );
         }
         return res;
     }
